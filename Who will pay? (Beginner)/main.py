@@ -1,3 +1,5 @@
+# Npte: random.choice() is a better option however, we are only learning basics for now
+
 import random # Import random module
 
 # Take user input
