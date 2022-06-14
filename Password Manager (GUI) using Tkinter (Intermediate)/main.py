@@ -1,14 +1,11 @@
-import random
+from random import choices, shuffle, randint
 from tkinter import *
-
-NUM_ALPHA = 8
-NUM_SYMBOLS = 4
-NUM_NUMBERS = 4
+from tkinter import messagebox
+import pyperclip
 
 
 # ---------------------------- PASSWORD GENERATOR ------------------------------- #
 def generate_password():
-    # Initialize character lists
     letters = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u',
                'v', 'w', 'x', 'y', 'z',
                'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U',
@@ -16,11 +13,15 @@ def generate_password():
     numbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9']
     symbols = ['!', '#', '$', '%', '&', '(', ')', '*', '+']
 
+    num_alpha = randint(4, 8)
+    num_symbols = randint(2, 4)
+    num_numbers = randint(2, 4)
+
     password_list = []
-    password_list.extend(random.choices(letters, weights=None, cum_weights=None, k=NUM_ALPHA))
-    password_list.extend(random.choices(symbols, weights=None, cum_weights=None, k=NUM_SYMBOLS))
-    password_list.extend(random.choices(numbers, weights=None, cum_weights=None, k=NUM_NUMBERS))
-    random.shuffle(password_list)
+    password_list.extend(choices(letters, weights=None, cum_weights=None, k=num_alpha))
+    password_list.extend(choices(symbols, weights=None, cum_weights=None, k=num_symbols))
+    password_list.extend(choices(numbers, weights=None, cum_weights=None, k=num_numbers))
+    shuffle(password_list)
     password = ''.join(password_list)
 
     return password
@@ -31,22 +32,26 @@ def generate_password_button():
     password = generate_password()
     password_box.delete(0, END)
     password_box.insert(END, string=password)
+    pyperclip.copy(password)
 
 
 def add_password_button():
-    save_password()
-    website_box.delete(0, END)
-    email_box.delete(0, END)
-    password_box.delete(0, END)
-    show_confirmation(3)
-
-
-def show_confirmation(confirmation_timer):
-    confirmation_label.config(foreground="green")
-    if confirmation_timer > 0:
-        window.after(1000, show_confirmation, confirmation_timer - 1)
+    if len(website_box.get()) != 0 and len(email_box.get()) != 0 and len(password_box.get()) != 0:
+        if confirm_details():
+            save_password()
+            website_box.delete(0, END)
+            password_box.delete(0, END)
+            messagebox.showinfo(title="Success", message="Password Saved and Copied to clipboard!")
     else:
-        confirmation_label.config(foreground="white")
+        messagebox.showerror(title="Oops!", message="Cannot leave fields empty!")
+
+
+def confirm_details():
+    is_ok = messagebox.askokcancel(title="Save details?", message=f"Website:{website_box.get()}"
+                                                                  f"\nEmail/Username:{email_box.get()}"
+                                                                  f"\nPassword: {password_box.get()}")
+
+    return is_ok
 
 
 # ---------------------------- SAVE PASSWORD ------------------------------- #
@@ -56,9 +61,9 @@ def save_password():
             pwd_file.write(f"Website: {website_box.get()} | Email/Username: {email_box.get()} "
                            f"| Password: {password_box.get()}\n")
     except OSError as err:
-        raise OSError(err)
+        messagebox.showerror(str(err))
     except BaseException as err:
-        print(f"Unexpected {err=}, {type(err)=}")
+        messagebox.showerror(f"Unexpected {err=}, {type(err)=}")
         raise
 
 
@@ -83,9 +88,6 @@ email_label.grid(row=2, column=0, sticky=E)
 
 password_label = Label(text="Password: ")
 password_label.grid(row=3, column=0, sticky=E)
-
-confirmation_label = Label(text="Password Saved!", foreground="white", font=("Arial", 15, "bold"))
-confirmation_label.grid(row=0, column=2)
 
 # Text Boxes
 website_box = Entry(width=35)
