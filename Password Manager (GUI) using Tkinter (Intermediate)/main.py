@@ -2,6 +2,7 @@ from random import choices, shuffle, randint
 from tkinter import *
 from tkinter import messagebox
 import pyperclip
+import json
 
 
 # ---------------------------- PASSWORD GENERATOR ------------------------------- #
@@ -37,34 +38,49 @@ def generate_password_button():
 
 def add_password_button():
     if len(website_box.get()) != 0 and len(email_box.get()) != 0 and len(password_box.get()) != 0:
-        if confirm_details():
-            save_password()
-            website_box.delete(0, END)
-            password_box.delete(0, END)
-            messagebox.showinfo(title="Success", message="Password Saved and Copied to clipboard!")
+        save_password()
+        website_box.delete(0, END)
+        password_box.delete(0, END)
+        messagebox.showinfo(title="Success", message="Password Saved and Copied to clipboard!")
     else:
         messagebox.showerror(title="Oops!", message="Cannot leave fields empty!")
 
 
-def confirm_details():
-    is_ok = messagebox.askokcancel(title="Save details?", message=f"Website:{website_box.get()}"
-                                                                  f"\nEmail/Username:{email_box.get()}"
-                                                                  f"\nPassword: {password_box.get()}")
-
-    return is_ok
+def search_button():
+    key = website_box.get()
+    try:
+        with open("saved_passwords.json", "r") as pwd_file:
+            entries = json.load(pwd_file)
+    except FileNotFoundError:
+        messagebox.showerror(title="Oops!", message="Could not locate password file!")
+    else:
+        if key in entries:
+            email_username = entries[key]["email/username"]
+            password = entries[key]["password"]
+            messagebox.showinfo(title=f"{key}", message=f"Email/Username: {email_username}\nPassword: {password}")
+            pyperclip.copy(password)
+        else:
+            messagebox.showerror(title="Oops!", message=f"Could not find any entry for {key}!")
 
 
 # ---------------------------- SAVE PASSWORD ------------------------------- #
 def save_password():
+    new_entry = {
+        website_box.get(): {
+            "email/username": email_box.get(),
+            "password": password_box.get(),
+        }
+    }
     try:
-        with open("saved_passwords.txt", "a") as pwd_file:
-            pwd_file.write(f"Website: {website_box.get()} | Email/Username: {email_box.get()} "
-                           f"| Password: {password_box.get()}\n")
-    except OSError as err:
-        messagebox.showerror(str(err))
-    except BaseException as err:
-        messagebox.showerror(f"Unexpected {err=}, {type(err)=}")
-        raise
+        with open("saved_passwords.json", "r") as pwd_file:
+            entry = json.load(pwd_file)
+            entry.update(new_entry)
+    except FileNotFoundError:
+        with open("saved_passwords.json", "w") as pwd_file:
+            json.dump(new_entry, pwd_file, indent=4)
+    else:
+        with open("saved_passwords.json", "w") as pwd_file:
+            json.dump(entry, pwd_file, indent=4)
 
 
 # ---------------------------- UI SETUP ------------------------------- #
@@ -90,16 +106,19 @@ password_label = Label(text="Password: ")
 password_label.grid(row=3, column=0, sticky=E)
 
 # Text Boxes
-website_box = Entry(width=35)
-website_box.grid(column=1, row=1, columnspan=2, sticky=W + N + S + E, pady=10)
+website_box = Entry(width=30)
+website_box.grid(column=1, row=1, sticky=W + E, pady=5)
 
 email_box = Entry(width=35)
-email_box.grid(column=1, row=2, columnspan=2, sticky=W + N + S + E, pady=10)
+email_box.grid(column=1, row=2, columnspan=2, sticky=W + N + S + E, pady=5)
 
 password_box = Entry(width=30)
-password_box.grid(column=1, row=3, sticky=W + E, pady=10)
+password_box.grid(column=1, row=3, sticky=W + E, pady=5)
 
 # Buttons
+search_button = Button(text="Search", command=search_button)
+search_button.grid(column=2, row=1, padx=5, sticky=W + E)
+
 generate_button = Button(text="Generate Password", command=generate_password_button)
 generate_button.grid(column=2, row=3, padx=5, sticky=W + E)
 
