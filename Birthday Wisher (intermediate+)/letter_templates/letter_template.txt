@@ -1,0 +1,6 @@
+Dear [RECEIVER_NAME],
+
+[BODY]
+
+[SIGNATURE],
+[SENDER_NAME]
