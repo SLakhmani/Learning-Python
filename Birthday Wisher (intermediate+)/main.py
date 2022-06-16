@@ -23,7 +23,7 @@ def send_emails(mailing_list):
                 connection.login(SENDER_EMAIL, SENDER_PASSWORD)
                 connection.sendmail(SENDER_EMAIL, receiver_email, message_body)
         except:
-            print(f"Unable to end email to: {receiver_email}")
+            print(f"Unable to send email to: {receiver_email}")
         else:
             sent_emails.append(receiver_email)
     return sent_emails
