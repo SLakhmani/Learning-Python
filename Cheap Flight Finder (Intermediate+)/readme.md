@@ -5,6 +5,7 @@ The **Cheap Flight Finder** app uses pre-determined data in google sheets to loo
 The IATA Column can be found by running the main.py script and can be left empty. The City column lists the cities to which we are travelling and the lowest price column lists the respective ticket price cutoffs.
 
 [Flight Search API used](https://tequila.kiwi.com/)
+
 [API to work with Google Sheets](https://sheety.co/)
 
 Note: A free account needs to be made to use any of the aforementioned API's.
