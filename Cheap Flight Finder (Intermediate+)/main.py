@@ -24,11 +24,6 @@ for city in sheet_data:
         flight_data = FlightData(current_city_cheapest)
         result_list.append(flight_data)
 
-notification_manager = NotificationManager(result_list)
+email_list = data_manager.get_emails()
+notification_manager = NotificationManager(result_list, email_list)
 alert_sent = notification_manager.construct_and_send()
-
-if alert_sent:
-    print("Alert Sent!")
-else:
-    print("No Deals Found...")
-
