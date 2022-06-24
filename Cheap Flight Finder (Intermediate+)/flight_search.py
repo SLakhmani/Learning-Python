@@ -6,7 +6,7 @@ FLY_FROM = "LON"  # IATA code of departure city
 TIME_DELTA = 6  # in months
 MIN_STAY_DUR = 7  # in days
 MAX_STAY_DUR = 28  # in days
-MAX_STOPOVERS = 0  # 0 means direct
+MAX_STOPOVERS = 2  # 0 means direct
 
 
 def find_cheapest(search_results):
